@@ -15,19 +15,19 @@ class MainApp(App):
         
         label = Label(text='Welcome to Sobriety!',
                       size_hint=(0.8, 0.8),
-                      pos=(100, 100),
+                      pos=(100, 80),
                       color=("000000"))
         
         layout.add_widget(label)
         
         soberButton = Button(text="Press to join sobriety!",
-                        size_hint=(0.3, 0.3),
+                        size_hint=(0.2, 0.2),
                         pos_hint={"center_x": 0.2, "y": 0},
                         color=("000000"),
                         background_color=("#ffeec2"))
         
         relapseButton = Button(text="Press if you relapse",
-                        size_hint=(0.3, 0.3),
+                        size_hint=(0.2, 0.2),
                         pos_hint={"center_x": 0.8, "y": 0},
                         color=("000000"),
                         background_color=("#ffeec2"))
