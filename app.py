@@ -66,7 +66,7 @@ def randomQuote():
 
 class MainApp(App):
     Window.clearcolor = (1, 1, 1, 1) # Set to white.
-    days = 0 # Set to 0.
+    days = int(open("data.txt").read())
     
     def build(self):
         layout = FloatLayout() # Create the initial layout.
@@ -108,6 +108,12 @@ class MainApp(App):
                             color=("000000"),
                             background_color=("#ffeec2"))
         
+        if self.days != 0:
+            label.text = f"Welcome to Sobriety!\nYou are {self.days} days sober!" # Update label text.
+            soberButton.text = "Add one day of sobriety!" # Update the text of the sober button button.
+            
+            if self.days >= 10:
+                quote.text = randomQuote() # Generate random quote.
         
         # This is the function for when the sober button is pressed.
         def soberButtonFunc(soberButton):
@@ -123,12 +129,22 @@ class MainApp(App):
                 
                 if self.days % 10 == 0:
                     quote.text = randomQuote() # Generate random quote every 10 days.
+            
+            # Save the days to the text file.
+            f = open("data.txt", "w")
+            f.write(str(self.days))
+            f.close()
         
         def relapseButtonFunc(relapseButton):
             self.days = 0 # Reset the number of days.
             label.text = "So sorry to see you relapse!" # Update label to match.
             soberButton.text = "Press to join sobriety!" # Reset the sobriety button text.
             quote.text = "" # Get rid of the quote.
+            
+            # Save the days to the text file.
+            f = open("data.txt", "w")
+            f.write(str(0))
+            f.close()
             show_relapse_popup() # Call the function to show the relapse popup.
         
         def helpButtonFunc(helpButton):
