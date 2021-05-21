@@ -15,7 +15,7 @@ class MainApp(App):
         
         label = Label(text='Welcome to Sobriety!',
                       size_hint=(0.8, 0.8),
-                      pos=(100, 100),
+                      pos=(100, 50),
                       color=("000000"))
         
         layout.add_widget(label)
