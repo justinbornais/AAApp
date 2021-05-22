@@ -219,6 +219,7 @@ class MainApp(App):
         label.color = [0, 0, 0]
         label.outline_width = 2
         label.outline_color = [1, 1, 1]
+        label.pos_hint = {"center_x": 0.5}
         return layout  # Basically returns the entire app setup.
 
 
