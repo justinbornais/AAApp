@@ -1,28 +1,30 @@
-import traceback
-
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.button import Button
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
-from kivy.lang import Builder
 from kivy.core.window import Window
 from kivy.uix.popup import Popup
-from kivy.properties import ObjectProperty, partial
 
 import time
 import webbrowser
 import random
-import importlib
 import threading
 
 # Random quotes about quitting drinking. Make sure quotes and quote_authors are aligned.
-quotes = ["You don't have to see the whole staircase, just take the first step.",
-          "When you quit drinking, you stop waiting.",
-          "Not drinking makes me a lot happier.",
-          "The day I became free of alcohol was the day that I fully understood and embraced the truth that I would not be giving anything up by not drinking.",
-          "First you take a drink, then the drink takes a drink, then the drink takes you."]
-quote_authors = ["Anonymous", "Caroline Knapp", "Naomi Campbell", "Liz Hemingway", "Anonymous"]
+quotes = [
+        "You don't have to see the whole staircase, just take the first step.",
+        "When you quit drinking, you stop waiting.",
+        "Not drinking makes me a lot happier.",
+        "The day I became free of alcohol was the day that I fully understood and embraced the truth that I would not be giving anything up by not drinking.",
+        "First you take a drink, then the drink takes a drink, then the drink takes you."]
+
+quote_authors = [
+    "Anonymous",
+    "Caroline Knapp",
+    "Naomi Campbell",
+    "Liz Hemingway",
+    "Anonymous"
+]
 
 mutex = threading.Lock()
 
@@ -39,7 +41,7 @@ def show_relapse_popup():
                      color=("000000"),  # Black.
                      background_color=("#ffffff"))  # White.
 
-    # Local function to link the person to a website about getting rid of drinking.
+    # Local function to link the user to a website about getting rid of drinking.
     def resources(button1):
         webbrowser.open(
             "https://www.canada.ca/en/health-canada/services/substance-use/get-help/get-help-problematic-substance-use.html")
@@ -133,21 +135,13 @@ class MainApp(App):
         layout.add_widget(quote)  # Add the quote.
 
         soberButton = Button(text="Press to join sobriety!",
-                             size_hint=(0.3, 0.3),
-                             pos_hint={"center_x": 0.5, "y": 0},
+                             size_hint=(0.5, 0.3),
+                             pos_hint={"center_x": 0.8, "y": 0},
                              color="000000",
                              background_color="#ffeec2")
 
-        relapseButton = Button(text="Press if you relapse",
-                               size_hint=(0.3, 0.3),
-                               pos_hint={"center_x": 0.8, "y": 0},
-                               color="000000",
-                               background_color="#ffeec2",
-                               # border=(30, 30, 30, 30)
-                               )
-
         helpButton = Button(text="Help! I wanna drink!",
-                            size_hint=(0.3, 0.3),
+                            size_hint=(0.5, 0.3),
                             pos_hint={"center_x": 0.2, "y": 0},
                             color="000000",
                             background_color="#ffeec2")
@@ -162,54 +156,48 @@ class MainApp(App):
                     mutex.release()
                     break
                 mutex.release()
-                soberButtonFunc(soberButton)
+                label.text = f"Welcome to Sobriety!\nYou are {formatSeconds(time.time() - self.startDate)} sober!"  # Update label text.
 
         if self.startDate != 0:
             clockThread = threading.Thread(target=refreshTime)
             clockThread.start()
-            soberButton.text = "Add one day of sobriety!"  # Update the text of the sober button button.
+            soberButton.text = "Press if you relapse"  # Update the text of the sober button button.
 
         # This is the function for when the sober button is pressed.
         def soberButtonFunc(soberButton):
             # Basically check if the person is sober already.
-            mutex.acquire()
+
             if soberButton.text == "Press to join sobriety!":
+                mutex.acquire()
                 f = open("data.txt", "w")
                 f.write(str(time.time()))
                 f.close()
-                soberButton.text = "Add one day of sobriety!"  # Update the text of this button.
+                soberButton.text = "Press if you relapse"  # Update the text of this button.
 
                 self.startDate = float(open("data.txt").read())
 
                 clockThread = threading.Thread(target=refreshTime)
                 clockThread.start()
-            mutex.release()
+                mutex.release()
 
-            if self.startDate != 0:
-                label.text = f"Welcome to Sobriety!\nYou are {formatSeconds(time.time() - self.startDate)} sober!"  # Update label text.
+            elif soberButton.text == "Press if you relapse":
+                mutex.acquire()
+                f = open("data.txt", "w")
+                f.write(str(0))
+                f.close()
+                mutex.release()
+                f = open("message.sob", "w")
+                f.write(str(1))
+                f.close()
+                label.text = "So sorry to see you relapse!"  # Update label to match.
+                soberButton.text = "Press to join sobriety!"  # Reset the sobriety button text.
+                quote.text = ""  # Get rid of the quote.
+                show_relapse_popup()  # Call the function to show the relapse popup.
+
 
             # if self.startDate % 10 == 0:
             #    quote.text = randomQuote() # Generate random quote every 10 days.
 
-            # Save the days to the text file.
-
-        def relapseButtonFunc(relapseButton):
-
-            # Save the days to the text file.
-            mutex.acquire()
-            f = open("data.txt", "w")
-            f.write(str(0))
-            f.close()
-            mutex.release()
-            f = open("message.sob", "w")
-            f.write(str(1))
-            f.close()
-
-            self.startDate = 0  # Reset the number of days.
-            label.text = "So sorry to see you relapse!"  # Update label to match.
-            soberButton.text = "Press to join sobriety!"  # Reset the sobriety button text.
-            quote.text = ""  # Get rid of the quote.
-            # show_relapse_popup()  # Call the function to show the relapse popup.
 
         def helpButtonFunc(helpButton):
             label.text = f"Hang in there, you can do this!\nYou're {formatSeconds(time.time() - self.startDate)} sober already! Keep it up!"  # Update label text to be more encouraging.
@@ -217,8 +205,6 @@ class MainApp(App):
 
         soberButton.bind(on_press=soberButtonFunc)  # Add the sober function to the sober button whenever pressed.
         layout.add_widget(soberButton)
-        relapseButton.bind(on_press=relapseButtonFunc)
-        layout.add_widget(relapseButton)
 
         helpButton.bind(on_press=helpButtonFunc)
         layout.add_widget(helpButton)
