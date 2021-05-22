@@ -1,4 +1,7 @@
 from kivy.app import App
+from kivy.core.image import Image
+from kivy.graphics.texture import Texture
+from kivy.graphics.vertex_instructions import Rectangle
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
@@ -12,11 +15,11 @@ import threading
 
 # Random quotes about quitting drinking. Make sure quotes and quote_authors are aligned.
 quotes = [
-        "You don't have to see the whole staircase, just take the first step.",
-        "When you quit drinking, you stop waiting.",
-        "Not drinking makes me a lot happier.",
-        "The day I became free of alcohol was the day that I fully understood and embraced the truth that I would not be giving anything up by not drinking.",
-        "First you take a drink, then the drink takes a drink, then the drink takes you."]
+    "You don't have to see the whole staircase, just take the first step.",
+    "When you quit drinking, you stop waiting.",
+    "Not drinking makes me a lot happier.",
+    "The day I became free of alcohol was the day that I fully understood and embraced the truth that I would not be giving anything up by not drinking.",
+    "First you take a drink, then the drink takes a drink, then the drink takes you."]
 
 quote_authors = [
     "Anonymous",
@@ -94,7 +97,7 @@ def formatSeconds(seconds):  # helper function to convert an amount of seconds t
 
     seconds = int(seconds)
 
-    return f"{days} days {hours} hours {minutes} minutes and {seconds} seconds"
+    return f"{days} days {hours} hours\n{minutes} minutes and {seconds} seconds"
 
 
 class MainApp(App):
@@ -194,21 +197,28 @@ class MainApp(App):
                 quote.text = ""  # Get rid of the quote.
                 show_relapse_popup()  # Call the function to show the relapse popup.
 
-
             # if self.startDate % 10 == 0:
             #    quote.text = randomQuote() # Generate random quote every 10 days.
-
 
         def helpButtonFunc(helpButton):
             label.text = f"Hang in there, you can do this!\nYou're {formatSeconds(time.time() - self.startDate)} sober already! Keep it up!"  # Update label text to be more encouraging.
             help_popup()  # Generate the help popup.
+
+        texture = Image('images/paradise.jpg').texture
+        with Window.canvas:
+            Rectangle(texture=texture, pos=(0, 0), size=(1280, 900))
 
         soberButton.bind(on_press=soberButtonFunc)  # Add the sober function to the sober button whenever pressed.
         layout.add_widget(soberButton)
 
         helpButton.bind(on_press=helpButtonFunc)
         layout.add_widget(helpButton)
-
+        # label.bold = True
+        # label.italic = True
+        # label.underline = True
+        label.color = [0, 0, 0]
+        label.outline_width = 2
+        label.outline_color = [1, 1, 1]
         return layout  # Basically returns the entire app setup.
 
 
