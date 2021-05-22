@@ -100,10 +100,12 @@ class MainApp(App):
                         background_color=("#ffeec2"))
         
         relapseButton = Button(text="Press if you relapse",
-                        size_hint=(0.2, 0.2),
+                        size_hint=(0.3, 0.3),
                         pos_hint={"center_x": 0.8, "y": 0},
                         color=("000000"),
-                        background_color=("#ffeec2"))
+                        background_color=("#ffeec2"),
+                        border=(30,30,30,30)
+                        )
         
         helpButton = Button(text="Help! I wanna drink!",
                             size_hint=(0.3, 0.3),
