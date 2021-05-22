@@ -7,6 +7,9 @@ from kivy.lang import Builder
 from kivy.core.window import Window
 from kivy.uix.popup import Popup
 from kivy.properties import ObjectProperty
+
+import time
+
 import webbrowser
 import random
 
@@ -66,7 +69,7 @@ def randomQuote():
 
 class MainApp(App):
     Window.clearcolor = (1, 1, 1, 1) # Set to white.
-    days = int(open("data.txt").read())
+    startDate = float(open("data.txt").read())
     
     def build(self):
         layout = FloatLayout() # Create the initial layout.
@@ -108,35 +111,34 @@ class MainApp(App):
                             color=("000000"),
                             background_color=("#ffeec2"))
         
-        if self.days != 0:
-            label.text = f"Welcome to Sobriety!\nYou are {self.days} days sober!" # Update label text.
+        if self.startDate != 0:
+            label.text = f"Welcome to Sobriety!\nYou are {self.startDate} days sober!" # Update label text.
             soberButton.text = "Add one day of sobriety!" # Update the text of the sober button button.
             
-            if self.days >= 10:
+            if self.startDate >= 10:
                 quote.text = randomQuote() # Generate random quote.
         
         # This is the function for when the sober button is pressed.
         def soberButtonFunc(soberButton):
-            
+
             # Basically check if the person is sober already.
             if soberButton.text == "Press to join sobriety!":
-                soberButton.text = "Add one day of sobriety!" # Update the text of this button.
-                self.days = 1
-                label.text = "Welcome to Sobriety!\nYou are 1 day sober!" # Change the label text.
-            else:
-                self.days += 1 # Increment days.
-                label.text = f"Welcome to Sobriety!\nYou are {self.days} days sober!" # Update label text.
+                f = open("data.txt", "w")
+                f.write(str(time.time()))
+                f.close()
+                soberButton.text = "Add one day of sobriety!"  # Update the text of this button.
+                self.startDate = float(open("data.txt").read())
+
+            label.text = f"Welcome to Sobriety!\nYou are {str(self.startDate)} days sober!"  # Update label text.
                 
-                if self.days % 10 == 0:
-                    quote.text = randomQuote() # Generate random quote every 10 days.
+            #if self.startDate % 10 == 0:
+            #    quote.text = randomQuote() # Generate random quote every 10 days.
             
             # Save the days to the text file.
-            f = open("data.txt", "w")
-            f.write(str(self.days))
-            f.close()
+
         
         def relapseButtonFunc(relapseButton):
-            self.days = 0 # Reset the number of days.
+            self.startDate = 0 # Reset the number of days.
             label.text = "So sorry to see you relapse!" # Update label to match.
             soberButton.text = "Press to join sobriety!" # Reset the sobriety button text.
             quote.text = "" # Get rid of the quote.
@@ -148,7 +150,7 @@ class MainApp(App):
             show_relapse_popup() # Call the function to show the relapse popup.
         
         def helpButtonFunc(helpButton):
-            label.text = f"Hang in there, you can do this!\nYou're {self.days} sober already! Keep it up!" # Update label text to be more encouraging.
+            label.text = f"Hang in there, you can do this!\nYou're {self.startDate} sober already! Keep it up!" # Update label text to be more encouraging.
             help_popup() # Generate the help popup.
         
         soberButton.bind(on_press=soberButtonFunc) # Add the sober function to the sober button whenever pressed.
