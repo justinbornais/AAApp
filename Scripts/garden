@@ -83,7 +83,7 @@ class GardenTool(object):
         if hasattr(options, 'func'):
             options.func()
 
-        # No cmd supplied, print help message
+        # No cmd supplied, print help message.sob
         else:
             parser.print_help()
 
