@@ -7,6 +7,7 @@ from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.core.window import Window
 from kivy.uix.popup import Popup
+from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 
 import time
 import webbrowser
@@ -100,6 +101,11 @@ def formatSeconds(seconds):  # helper function to convert an amount of seconds t
     return f"{days} days {hours} hours\n{minutes} minutes and {seconds} seconds"
 
 
+
+class ScreenManagement(ScreenManager):
+    def __init__(self, **kwargs):
+        super(ScreenManagement, self).__init__(**kwargs)
+
 class MainApp(App):
     Window.clearcolor = (1, 1, 1, 1)  # Set to white.
 
@@ -117,6 +123,7 @@ class MainApp(App):
     def build(self):
         Window.bind(on_request_close=self.on_request_close)
         layout = FloatLayout()  # Create the initial layout.
+        layout.name = "Main"
 
         quote = Label(text="",  # Text is empty as there is no quote.
                       color="000000",  # Black.
@@ -203,6 +210,7 @@ class MainApp(App):
         def helpButtonFunc(helpButton):
             label.text = f"Hang in there, you can do this!\nYou're {formatSeconds(time.time() - self.startDate)} sober already! Keep it up!"  # Update label text to be more encouraging.
             help_popup()  # Generate the help popup.
+            app.root.current = "second"
 
         texture = Image('images/paradise.jpg').texture
         with Window.canvas:
@@ -220,6 +228,7 @@ class MainApp(App):
         label.outline_width = 2
         label.outline_color = [1, 1, 1]
         label.pos_hint = {"center_x": 0.5}
+        
         return layout  # Basically returns the entire app setup.
 
 
