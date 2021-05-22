@@ -67,6 +67,24 @@ def randomQuote():
     return (quotes[num] + "\n-" + quote_authors[num])
 
 
+def formatSeconds(seconds):
+
+    days = 0
+    hours = 0
+    minutes = 0
+
+    days = int(seconds/86400)
+    seconds = seconds - days*86400
+    hours = int(seconds/3600)
+    seconds = seconds - hours*3600
+    minutes = int(seconds/60)
+    seconds = seconds - minutes*60
+
+    seconds = int(seconds)
+
+    return f"{days} days {hours} hours {minutes} minutes and {seconds} seconds"
+
+
 class MainApp(App):
     Window.clearcolor = (1, 1, 1, 1) # Set to white.
     startDate = float(open("data.txt").read())
@@ -131,7 +149,7 @@ class MainApp(App):
                 soberButton.text = "Add one day of sobriety!"  # Update the text of this button.
                 self.startDate = float(open("data.txt").read())
 
-            label.text = f"Welcome to Sobriety!\nYou are {str(self.startDate)} days sober!"  # Update label text.
+            label.text = f"Welcome to Sobriety!\nYou are {formatSeconds(time.time() - self.startDate)} sober!"  # Update label text.
                 
             #if self.startDate % 10 == 0:
             #    quote.text = randomQuote() # Generate random quote every 10 days.
