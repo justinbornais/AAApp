@@ -9,10 +9,10 @@ from kivy.uix.popup import Popup
 from kivy.properties import ObjectProperty
 
 import time
-
 import webbrowser
 import random
-
+import importlib
+import threading
 # Random quotes about quitting drinking. Make sure quotes and quote_authors are aligned.
 quotes = ["You don't have to see the whole staircase, just take the first step.",
         "When you quit drinking, you stop waiting.",
@@ -90,6 +90,7 @@ class MainApp(App):
     startDate = float(open("data.txt").read())
     
     def build(self):
+        condition=True
         layout = FloatLayout() # Create the initial layout.
         
         quote = Label(text="", # Text is empty as there is no quote.
@@ -148,7 +149,7 @@ class MainApp(App):
                 f.close()
                 soberButton.text = "Add one day of sobriety!"  # Update the text of this button.
                 self.startDate = float(open("data.txt").read())
-
+                
             label.text = f"Welcome to Sobriety!\nYou are {formatSeconds(time.time() - self.startDate)} sober!"  # Update label text.
                 
             #if self.startDate % 10 == 0:
@@ -156,8 +157,16 @@ class MainApp(App):
             
             # Save the days to the text file.
 
+        def refreshTime():
+            while(True):
+                if not condition:
+                    break  #without this if statement the program counts in realtime
+                            #try and figure out a solution how to end this loop on relapse button click
+                            #currently i had a variable which would be updated when relapse function is called but my implementation seems to be flawe
+                soberButtonFunc(soberButton)
         
         def relapseButtonFunc(relapseButton):
+            condition=False
             self.startDate = 0 # Reset the number of days.
             label.text = "So sorry to see you relapse!" # Update label to match.
             soberButton.text = "Press to join sobriety!" # Reset the sobriety button text.
@@ -167,13 +176,16 @@ class MainApp(App):
             f = open("data.txt", "w")
             f.write(str(0))
             f.close()
+
             show_relapse_popup() # Call the function to show the relapse popup.
         
         def helpButtonFunc(helpButton):
             label.text = f"Hang in there, you can do this!\nYou're {self.startDate} sober already! Keep it up!" # Update label text to be more encouraging.
             help_popup() # Generate the help popup.
-        
+
+        x = threading.Thread(target=refreshTime, args=(1,))
         soberButton.bind(on_press=soberButtonFunc) # Add the sober function to the sober button whenever pressed.
+        x.start()
         layout.add_widget(soberButton)
         
         relapseButton.bind(on_press=relapseButtonFunc)
