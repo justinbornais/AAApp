@@ -150,7 +150,7 @@ class MainApp(App):
                              pos_hint={"center_x": 0.5, "y": 0.91},
                              color="000000",
                              background_color="#A79C9A")              
-        layout.add_widget(navBar)
+        #layout.add_widget(navBar)
         layout.add_widget(label)  # Add the title to the layout.
         layout.add_widget(quote)  # Add the quote.
 
