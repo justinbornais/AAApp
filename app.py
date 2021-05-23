@@ -150,7 +150,7 @@ class MainApp(App):
                              color="000000",
                              background_color="#ffeec2")
 
-        helpButton = Button(text="Help! I wanna drink!",
+        helpButton = Button(text="Help! I am having temptations!",
                             size_hint=(0.5, 0.3),
                             pos_hint={"center_x": 0.2, "y": 0},
                             color="000000",
