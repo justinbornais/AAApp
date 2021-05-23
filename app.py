@@ -5,9 +5,12 @@ from kivy.graphics.vertex_instructions import Rectangle
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
+from kivy.uix.actionbar import ActionBar
+from kivy.uix.widget import Widget
 
 import time
 import webbrowser
@@ -106,6 +109,8 @@ class ScreenManagement(ScreenManager):
     def __init__(self, **kwargs):
         super(ScreenManagement, self).__init__(**kwargs)
 
+class navBar(Widget):
+    pass
 class MainApp(App):
     Window.clearcolor = (1, 1, 1, 1)  # Set to white.
 
@@ -140,7 +145,12 @@ class MainApp(App):
                       pos=(100, 150),
                       font_size="20sp",
                       color="000000")
-
+        navBar= ActionBar(text="NavBar",
+                             size_hint=(1.0, 0.1),
+                             pos_hint={"center_x": 0.5, "y": 0.91},
+                             color="000000",
+                             background_color="#A79C9A")              
+        layout.add_widget(navBar)
         layout.add_widget(label)  # Add the title to the layout.
         layout.add_widget(quote)  # Add the quote.
 
@@ -155,7 +165,9 @@ class MainApp(App):
                             pos_hint={"center_x": 0.2, "y": 0},
                             color="000000",
                             background_color="#ffeec2")
-
+        
+        
+        
         def refreshTime():  # run function for the clock thread. Keeps clock active
             f = open("message.sob", "w")
             f.write(str(0))
@@ -215,12 +227,12 @@ class MainApp(App):
         texture = Image('images/paradise.jpg').texture
         with Window.canvas:
             Rectangle(texture=texture, pos=(0, 0), size=(1280, 900))
-
+        
         soberButton.bind(on_press=soberButtonFunc)  # Add the sober function to the sober button whenever pressed.
         layout.add_widget(soberButton)
-
         helpButton.bind(on_press=helpButtonFunc)
         layout.add_widget(helpButton)
+        
         # label.bold = True
         # label.italic = True
         # label.underline = True
@@ -228,9 +240,7 @@ class MainApp(App):
         label.outline_width = 2
         label.outline_color = [1, 1, 1]
         label.pos_hint = {"center_x": 0.5}
-        
         return layout  # Basically returns the entire app setup.
-
 
 # Just don't touch.
 if __name__ == '__main__':
