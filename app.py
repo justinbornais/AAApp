@@ -14,6 +14,12 @@ import webbrowser
 import random
 import threading
 
+mutex = threading.Lock()
+
+mutex.acquire()
+startDate = float(open("data.txt").read())
+mutex.release()
+
 # Random quotes about quitting drinking. Make sure quotes and quote_authors are aligned.
 quotes = [
     "You don't have to see the whole staircase, just take the first step.",
@@ -29,8 +35,6 @@ quote_authors = [
     "Liz Hemingway",
     "Anonymous"
 ]
-
-mutex = threading.Lock()
 
 
 # The popup for when the person relapses.
@@ -106,24 +110,9 @@ class ScreenManagement(ScreenManager):
     def __init__(self, **kwargs):
         super(ScreenManagement, self).__init__(**kwargs)
 
-class MainApp(App):
-    Window.clearcolor = (1, 1, 1, 1)  # Set to white.
-
-    mutex.acquire()
-    startDate = float(open("data.txt").read())
-    mutex.release()
-
-    def on_request_close(self, *args):
-        f = open("message.sob", "w")
-        f.write(str(1))
-        f.close()
-        self.stop()
-        return True
-
-    def build(self):
-        Window.bind(on_request_close=self.on_request_close)
-        layout = FloatLayout()  # Create the initial layout.
-        layout.name = "Main"
+class MainPage(Screen):
+    def __init__(self, **kwargs):
+        super(MainPage, self).__init__(**kwargs)
 
         quote = Label(text="",  # Text is empty as there is no quote.
                       color="000000",  # Black.
@@ -141,8 +130,8 @@ class MainApp(App):
                       font_size="20sp",
                       color="000000")
 
-        layout.add_widget(label)  # Add the title to the layout.
-        layout.add_widget(quote)  # Add the quote.
+        self.add_widget(label)  # Add the title to the layout.
+        self.add_widget(quote)  # Add the quote.
 
         soberButton = Button(text="Press to join sobriety!",
                              size_hint=(0.5, 0.3),
@@ -157,6 +146,7 @@ class MainApp(App):
                             background_color="#ffeec2")
 
         def refreshTime():  # run function for the clock thread. Keeps clock active
+            startDate = float(open("data.txt").read())
             f = open("message.sob", "w")
             f.write(str(0))
             f.close()
@@ -166,9 +156,9 @@ class MainApp(App):
                     mutex.release()
                     break
                 mutex.release()
-                label.text = f"Welcome to Sobriety!\nYou are {formatSeconds(time.time() - self.startDate)} sober!"  # Update label text.
+                label.text = f"Welcome to Sobriety!\nYou are {formatSeconds(time.time() - startDate)} sober!"  # Update label text.
 
-        if self.startDate != 0:
+        if startDate != 0:
             clockThread = threading.Thread(target=refreshTime)
             clockThread.start()
             soberButton.text = "Press if you relapse"  # Update the text of the sober button button.
@@ -184,7 +174,7 @@ class MainApp(App):
                 f.close()
                 soberButton.text = "Press if you relapse"  # Update the text of this button.
 
-                self.startDate = float(open("data.txt").read())
+                startDate = float(open("data.txt").read())
 
                 clockThread = threading.Thread(target=refreshTime)
                 clockThread.start()
@@ -196,6 +186,7 @@ class MainApp(App):
                 f.write(str(0))
                 f.close()
                 mutex.release()
+                startDate = 0
                 f = open("message.sob", "w")
                 f.write(str(1))
                 f.close()
@@ -206,21 +197,16 @@ class MainApp(App):
 
             # if self.startDate % 10 == 0:
             #    quote.text = randomQuote() # Generate random quote every 10 days.
-
-        def helpButtonFunc(helpButton):
-            label.text = f"Hang in there, you can do this!\nYou're {formatSeconds(time.time() - self.startDate)} sober already! Keep it up!"  # Update label text to be more encouraging.
-            help_popup()  # Generate the help popup.
-            app.root.current = "second"
-
+        
         texture = Image('images/paradise.jpg').texture
         with Window.canvas:
             Rectangle(texture=texture, pos=(0, 0), size=(1280, 900))
 
         soberButton.bind(on_press=soberButtonFunc)  # Add the sober function to the sober button whenever pressed.
-        layout.add_widget(soberButton)
+        self.add_widget(soberButton)
 
-        helpButton.bind(on_press=helpButtonFunc)
-        layout.add_widget(helpButton)
+        helpButton.bind(on_press=self.screen_transition)
+        self.add_widget(helpButton)
         # label.bold = True
         # label.italic = True
         # label.underline = True
@@ -228,8 +214,82 @@ class MainApp(App):
         label.outline_width = 2
         label.outline_color = [1, 1, 1]
         label.pos_hint = {"center_x": 0.5}
+    
+    def screen_transition(self, *args):
+            self.manager.current = 'second'
+
+
+class SecondPage(Screen):
+    def __init__(self, **kwargs):
+        super(SecondPage, self).__init__(**kwargs)
         
-        return layout  # Basically returns the entire app setup.
+        label = Label(text="Don't give up just yet! You're doing great!",
+                    size_hint=(0.8, 0.8),  # 0.8 of the screen for both x and y.
+                    halign="center",  # Center the text.
+                    pos=(100, 150),
+                    font_size="20sp",
+                    color="000000")
+        self.add_widget(label)
+        
+        button1 = Button(text="Click to view 11 tips to deal with urges to drink!",
+                        size_hint=(1, 0.2),
+                        pos_hint={"center_x": 0.5, "y": 0},
+                        color="000000",
+                        background_color="#ffeec2")
+        
+        def resources(button1):
+            webbrowser.open("https://checkupandchoices.com/11-tips-and-ways-to-deal-with-urges-and-cravings-to-drink-and-can-be-helpful-in-dealing-with-urges-to-use-drugs-too/")
+        
+        button1.bind(on_press=resources)
+        self.add_widget(button1)
+        
+        button2 = Button(text="Click to view an article depicting dealing with the urge to drink!",
+                        size_hint=(1, 0.2),
+                        pos_hint={"center_x": 0.5, "y": 0.2},
+                        color="000000",
+                        background_color="#ffeec2")
+        
+        def resources2(button2):
+            webbrowser.open("https://www.livewelldorset.co.uk/articles/dealing-with-the-urge-to-drink/")
+        
+        button2.bind(on_press=resources2)
+        self.add_widget(button2)
+        
+        back = Button(text="<- Back",
+                    color=("000000"),
+                    background_color="#ffeec2",
+                    size_hint=(0.2, 0.2),
+                    pos_hint={"center_x": 0.1, "center_y": 0.9})
+        
+        back.bind(on_press=self.screen_transition)
+        self.add_widget(back)
+        
+        texture = Image('images/paradise.jpg').texture
+        with Window.canvas:
+            Rectangle(texture=texture, pos=(0, 0), size=(1280, 900))
+    
+    def screen_transition(self, *args):
+        self.manager.current = 'main'
+    
+
+class MainApp(App):
+    Window.clearcolor = (1, 1, 1, 1)  # Set to white.
+
+    def on_request_close(self, *args):
+        f = open("message.sob", "w")
+        f.write(str(1))
+        f.close()
+        self.stop()
+        return True
+
+    def build(self):
+        
+        Window.bind(on_request_close=self.on_request_close)
+        
+        sm = ScreenManagement()
+        sm.add_widget(MainPage(name="main"))
+        sm.add_widget(SecondPage(name="second"))
+        return sm  # Basically returns the entire app setup.
 
 
 # Just don't touch.
